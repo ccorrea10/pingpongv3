@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ping Pong Game</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #E9EFF9;
+    }
+    canvas {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+  <script>
+    // Simple ping pong game logic
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    
+    let ballRadius = 10;
+    let x = canvas.width / 2;
+    let y = canvas.height / 2;
+    let dx = 2;
+    let dy = -2;
+
+    let paddleHeight = 75;
+    let paddleWidth = 10;
+    let rightPaddleY = (canvas.height - paddleHeight) / 2;
+    let leftPaddleY = (canvas.height - paddleHeight) / 2;
+    
+    const rightPaddle = {x: canvas.width - paddleWidth, y: rightPaddleY};
+    const leftPaddle = {x: 0, y: leftPaddleY};
+
+    // Listen for mouse movement to control the paddles
+    canvas.addEventListener("mousemove", (event) => {
+      const mouseY = event.clientY - canvas.offsetTop;
+      leftPaddle.y = mouseY - paddleHeight / 2;
+    });
+
+    // Game Loop
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw paddles and ball
+      ctx.fillStyle = "#4285F4"; // Left paddle (rounded)
+      ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+
+      ctx.fillStyle = "#EA4335"; // Right paddle (rounded)
+      ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
+
+      ctx.fillStyle = "#34A853"; // Ball
+      ctx.beginPath();
+      ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.closePath();
+
+      // Ball movement
+      x += dx;
+      y += dy;
+
+      // Ball collision with top and bottom
+      if (y + dy < ballRadius || y + dy > canvas.height - ballRadius) {
+        dy = -dy;
+      }
+
+      // Ball collision with paddles
+      if (x + dx > canvas.width - ballRadius - paddleWidth && y > rightPaddle.y && y < rightPaddle.y + paddleHeight) {
+        dx = -dx;
+      } else if (x + dx < ballRadius + paddleWidth && y > leftPaddle.y && y < leftPaddle.y + paddleHeight) {
+        dx = -dx;
+      }
+
+      // Ball out of bounds, reset position
+      if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
+        x = canvas.width / 2;
+        y = canvas.height / 2;
+        dx = 2;
+        dy = -2;
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
